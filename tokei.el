@@ -1,0 +1,136 @@
+;;; tokei.el --- Display codebase statistics -*- lexical-binding: t; -*-
+;;
+;; Copyright (C) 2022 Daniel Nagy
+;;
+;; Author: Daniel Nagy <https://github.com/nagy>
+;; Maintainer: Daniel Nagy <danielnagy@posteo.de>
+;; Created: April 1, 2022
+;; Version: 0.1
+;; Homepage: https://github.com/nagy/tokei.el
+;; Package-Requires: ((emacs "27.1") magit-section)
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;;
+;;; Commentary:
+;;
+;;  Tokei mode for Emacs
+;;
+;;; Code:
+
+(require 'cl-lib)
+(require 'magit-section)
+(require 'json)
+
+(defface tokei-num-code-face nil
+  "Tokei number of lines of code."
+  :group 'faces)
+
+(defface tokei-num-comments-face nil
+  "Tokei number of lines of comments."
+  :group 'faces)
+
+(defvar-local tokei-data nil "Tokei buffer local data.")
+
+(defvar tokei-program "tokei" "Path to the tokei program.")
+
+(defun tokei--data ()
+  (json-parse-string
+    (with-temp-buffer
+      (if (zerop (call-process tokei-program nil t nil "--output=json" "--sort" "code"))
+        (buffer-string)
+        ""))
+    :object-type 'alist
+    :array-type 'list))
+
+(defun tokei--sort-predicate (elem1 elem2)
+  "A predicate to compare elem1 and elemt2 by num of code and then name."
+  (let ((numcode1 (or (alist-get 'code elem1) (alist-get 'code (alist-get 'stats elem1))))
+       (numcode2 (or (alist-get 'code elem2) (alist-get 'code (alist-get 'stats elem2))))
+       (name1 (or (alist-get 'name elem1) (car  elem1)))
+       (name2 (or (alist-get 'name elem2) (car  elem2))))
+    (if (= numcode1 numcode2)
+      (string-lessp name1 name2)
+      (> numcode1 numcode2))))
+
+(cl-defun tokei--get-sorted (&optional (data tokei-data))
+  (sort (copy-sequence data) #'tokei--sort-predicate))
+
+(defun tokei--formatted-stats (code comments)
+  (string-join
+    (list
+      (propertize (number-to-string code) 'face 'tokei-num-code-face)
+      (propertize (number-to-string comments) 'face 'tokei-num-comments-face))
+    " · "))
+
+(defun tokei--get-formatted-files (json)
+  (cl-loop for s in (sort
+                (copy-sequence (alist-get 'reports json))
+                #'tokei--sort-predicate)
+    collect
+    (list
+      :name (alist-get 'name s)
+      :code (alist-get 'code (alist-get 'stats s))
+      :comments (alist-get 'comments (alist-get 'stats s))
+      :blanks (alist-get 'blanks (alist-get 'stats s)))))
+
+(define-derived-mode tokei-mode magit-section-mode "Tokei"
+  "Tokei mode."
+  (setq tokei-data (tokei--data))
+  (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (magit-insert-section (tokei-root)
+      (cl-loop for lang in (tokei--get-sorted)
+        for langname = (format "%s" (car lang))
+        unless (string= langname "Total")
+        do
+        (magit-insert-section (tokei-language langname)
+          (magit-insert-heading (concat
+                                  (propertize langname 'face 'magit-section-heading)
+                                  " "
+                                  (tokei--formatted-stats (alist-get 'code lang) (alist-get 'comments lang))
+                                  "\n"))
+          (cl-loop for file in (tokei--get-formatted-files lang)
+            for filename = (plist-get file :name)
+            for numcode = (plist-get file :code)
+            for numcomments = (plist-get file :comments)
+            do
+            (magit-insert-section (tokei-file filename)
+              (insert
+                (string-remove-prefix "./" filename)
+                " "
+                (tokei--formatted-stats numcode numcomments)
+                "\n")))
+          (insert "\n"))))
+    (setf (point) (point-min))))
+
+;;;###autoload
+(defun tokei ()
+  "Show codebase statistics."
+  (interactive)
+  (switch-to-buffer (generate-new-buffer "*tokei*"))
+  (tokei-mode))
+
+;; TODO virtual dired from one language files
+;; TODO context-menu
+;; TODO dired tokei only marked entries to filter out
+;; TODO count all marked lines
+;; TODO region counter
+;; TODO show only minimum amount of code/comment lines. take prefix argument
+;; TODO segment definition for telephone line
+
+(provide 'tokei)
+;;; tokei.el ends here
