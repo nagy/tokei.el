@@ -47,16 +47,17 @@
 (defvar tokei-program "tokei" "Path to the tokei program.")
 
 (defun tokei--data ()
+  "Return newly created tokei data for this directory."
   (json-parse-string
     (with-temp-buffer
-      (if (zerop (call-process tokei-program nil t nil "--output=json" "--sort" "code"))
+      (if (zerop (call-process tokei-program nil t nil "--output=json" ))
         (buffer-string)
         ""))
     :object-type 'alist
     :array-type 'list))
 
 (defun tokei--sort-predicate (elem1 elem2)
-  "A predicate to compare elem1 and elemt2 by num of code and then name."
+  "A predicate to compare ELEM1 and ELEM2 by num of code and then name."
   (let ((numcode1 (or (alist-get 'code elem1) (alist-get 'code (alist-get 'stats elem1))))
        (numcode2 (or (alist-get 'code elem2) (alist-get 'code (alist-get 'stats elem2))))
        (name1 (or (alist-get 'name elem1) (car  elem1)))
@@ -66,9 +67,13 @@
       (> numcode1 numcode2))))
 
 (cl-defun tokei--get-sorted (&optional (data tokei-data))
+  "Sort the provided tokei DATA."
   (sort (copy-sequence data) #'tokei--sort-predicate))
 
 (defun tokei--formatted-stats (code comments)
+  "Format one entry.
+
+Takes CODE and COMMENTS entries."
   (string-join
     (list
       (propertize (number-to-string code) 'face 'tokei-num-code-face)
@@ -76,6 +81,9 @@
     " · "))
 
 (defun tokei--get-formatted-files (json)
+  "Retrieve multiple formatted entries.
+
+Data is provided via the JSON argument"
   (cl-loop for s in (sort
                 (copy-sequence (alist-get 'reports json))
                 #'tokei--sort-predicate)
