@@ -7,7 +7,7 @@
 ;; Created: April 1, 2022
 ;; Version: 0.1
 ;; Homepage: https://github.com/nagy/tokei.el
-;; Package-Requires: ((emacs "27.1") magit-section)
+;; Package-Requires: ((emacs "27.1") (magit-section "3.3.0"))
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -30,21 +30,40 @@
 ;;
 ;;; Code:
 
-(require 'cl-lib)
 (require 'magit-section)
 (require 'json)
+(eval-when-compile
+  (require 'cl-lib))
+
+;;; Options
+
+(defgroup tokei nil
+  "Display codebase statistics."
+  :group 'extensions
+  :prefix "tokei-")
+
+(defcustom tokei-program "tokei"
+  "Path to the 'tokei' program."
+  :type 'string)
+
+;;;; Faces
+
+(defgroup tokei-faces nil
+  "Faces used by Tokei."
+  :group 'tokei
+  :group 'faces)
 
 (defface tokei-num-code-face nil
   "Tokei number of lines of code."
-  :group 'faces)
+  :group 'tokei-faces)
 
 (defface tokei-num-comments-face nil
   "Tokei number of lines of comments."
-  :group 'faces)
+  :group 'tokei-faces)
+
+;;; Commands
 
 (defvar-local tokei-data nil "Tokei buffer local data.")
-
-(defvar tokei-program "tokei" "Path to the tokei program.")
 
 (defun tokei--data ()
   "Return newly created tokei data for this directory."
@@ -96,6 +115,7 @@ Data is provided via the JSON argument"
 
 (define-derived-mode tokei-mode magit-section-mode "Tokei"
   "Tokei mode."
+  :group 'tokei
   (setq tokei-data (tokei--data))
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
   (let ((inhibit-read-only t))
@@ -135,10 +155,10 @@ Data is provided via the JSON argument"
 ;; TODO virtual dired from one language files
 ;; TODO context-menu
 ;; TODO dired tokei only marked entries to filter out
-;; TODO count all marked lines
-;; TODO region counter
+;; TODO count all marked lines ( region )
 ;; TODO show only minimum amount of code/comment lines. take prefix argument
 ;; TODO segment definition for telephone line
+;; TODO project.el mode new in emacs
 
 (provide 'tokei)
 ;;; tokei.el ends here
