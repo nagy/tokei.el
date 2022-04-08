@@ -93,11 +93,20 @@
   "Format one entry.
 
 Takes CODE and COMMENTS entries."
-  (string-join
-    (list
-      (propertize (number-to-string code) 'face 'tokei-num-code-face)
-      (propertize (number-to-string comments) 'face 'tokei-num-comments-face))
-    " · "))
+  (concat
+    (cond
+      ((>= 9 code) "    ")
+      ((>= 99 code) "   ")
+      ((>= 999 code) "  ")
+      ((>= 9999 code) " "))
+    (propertize (number-to-string code) 'face 'tokei-num-code-face)
+    " · "
+    (cond
+      ((>= 9 comments) "    ")
+      ((>= 99 comments) "   ")
+      ((>= 999 comments) "  ")
+      ((>= 9999 comments) " "))
+    (propertize (number-to-string comments) 'face 'tokei-num-comments-face)))
 
 (defun tokei--get-formatted-files (json)
   "Retrieve multiple formatted entries.
@@ -128,7 +137,7 @@ Data is provided via the JSON argument"
         (magit-insert-section (tokei-language langname)
           (magit-insert-heading (concat
                                   (propertize langname 'face 'magit-section-heading)
-                                  " "
+                                  (propertize " " 'display '(space :align-to center))
                                   (tokei--formatted-stats (alist-get 'code lang) (alist-get 'comments lang))
                                   "\n"))
           (cl-loop for file in (tokei--get-formatted-files lang)
@@ -139,7 +148,7 @@ Data is provided via the JSON argument"
             (magit-insert-section (tokei-file filename)
               (insert
                 (string-remove-prefix "./" filename)
-                " "
+                (propertize " " 'display '(space :align-to center))
                 (tokei--formatted-stats numcode numcomments)
                 "\n")))
           (insert "\n"))))
