@@ -50,6 +50,10 @@
   "If non-nil, display a header line."
   :type 'boolean)
 
+(defcustom tokei-separator " · "
+  "The separator to be displayed between code and comment numbers."
+  :type 'string)
+
 ;;;; Faces
 
 (defgroup tokei-faces nil
@@ -104,7 +108,7 @@ Takes CODE and COMMENTS entries."
       ((>= 999 code) "  ")
       ((>= 9999 code) " "))
     (propertize (number-to-string code) 'face 'tokei-num-code-face)
-    " · "
+    tokei-separator
     (cond
       ((>= 9 comments) "    ")
       ((>= 99 comments) "   ")
@@ -136,7 +140,7 @@ Data is provided via the JSON argument."
                                      "File"
                                      (propertize " " 'display '(space :align-to center))
                                      "Code"
-                                     " · "
+                                     tokei-separator
                                      "Comments")))
   (let ((inhibit-read-only t))
     (erase-buffer)
