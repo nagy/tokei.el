@@ -46,6 +46,10 @@
   "Path to the 'tokei' program."
   :type 'string)
 
+(defcustom tokei-use-header-line t
+  "If non-nil, display a header line."
+  :type 'boolean)
+
 ;;;; Faces
 
 (defgroup tokei-faces nil
@@ -127,6 +131,13 @@ Data is provided via the JSON argument."
   :group 'tokei
   (setq tokei-data (tokei--data))
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
+  (when tokei-use-header-line
+    (setq-local header-line-format (concat
+                                     "File"
+                                     (propertize " " 'display '(space :align-to center))
+                                     "Code"
+                                     " · "
+                                     "Comments")))
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
