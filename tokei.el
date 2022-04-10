@@ -111,7 +111,7 @@ Takes CODE and COMMENTS entries."
 (defun tokei--get-formatted-files (json)
   "Retrieve multiple formatted entries.
 
-Data is provided via the JSON argument"
+Data is provided via the JSON argument."
   (cl-loop for s in (sort
                 (copy-sequence (alist-get 'reports json))
                 #'tokei--sort-predicate)
@@ -159,7 +159,7 @@ Data is provided via the JSON argument"
   "Show codebase statistics."
   (interactive)
   (unless (executable-find tokei-program)
-    (user-error "command not found: %s" tokei-program))
+    (user-error "Command not found: %s" tokei-program))
   (switch-to-buffer (generate-new-buffer "*tokei*"))
   (tokei-mode))
 
