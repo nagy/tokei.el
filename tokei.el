@@ -149,6 +149,8 @@ Data is provided via the JSON argument"
 (defun tokei ()
   "Show codebase statistics."
   (interactive)
+  (unless (executable-find tokei-program)
+    (user-error "command not found: %s" tokei-program))
   (switch-to-buffer (generate-new-buffer "*tokei*"))
   (tokei-mode))
 
