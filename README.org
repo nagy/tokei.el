@@ -6,7 +6,8 @@ Tokei.el is a major-mode for Emacs, that displays codebase statistics with the h
 
 * Usage
 
-After installing, you can use it with =M-x tokei= in any folder, which you want to scan. Make sure, that the =tokei= executable is in your =PATH=.
+After installing, you can use it with =M-x tokei= in any folder, which you want to scan.
+Either make sure, that the =tokei= executable is in your =PATH=, or customize =tokei-program= to where it resides.
 
 * License
 
