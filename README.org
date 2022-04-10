@@ -11,4 +11,4 @@ Either make sure, that the =tokei= executable is in your =PATH=, or customize =t
 
 * License
 
-GPL3+
+[[./LICENSE][GPL3+]]
