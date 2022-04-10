@@ -139,11 +139,11 @@ Data is provided via the JSON argument."
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
   (when tokei-use-header-line
     (setq-local header-line-format (concat
-                                     "File"
-                                     (propertize " " 'display '(space :align-to center))
-                                     "Code"
-                                     tokei-separator
-                                     "Comments")))
+                            "File"
+                            (propertize " " 'display '(space :align-to center))
+                            "Code"
+                            tokei-separator
+                            "Comments")))
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
