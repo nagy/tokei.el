@@ -33,7 +33,8 @@
 (require 'magit-section)
 (require 'json)
 (eval-when-compile
-  (require 'cl-lib))
+  (require 'cl-lib)
+  (require 'let-alist))
 
 ;;; Options
 
@@ -124,11 +125,12 @@ Data is provided via the JSON argument."
                 (copy-sequence (alist-get 'reports json))
                 #'tokei--sort-predicate)
     collect
-    (list
-      :name (alist-get 'name s)
-      :code (alist-get 'code (alist-get 'stats s))
-      :comments (alist-get 'comments (alist-get 'stats s))
-      :blanks (alist-get 'blanks (alist-get 'stats s)))))
+    (let-alist s
+      (list
+        :name .name
+        :code .stats.code
+        :comments .stats.comments
+        :blanks .stats.blanks))))
 
 (define-derived-mode tokei-mode magit-section-mode "Tokei"
   "Tokei mode."
