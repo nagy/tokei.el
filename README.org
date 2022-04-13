@@ -1,4 +1,9 @@
 #+TITLE: tokei.el - Display codebase statistics
+#+author: Daniel Nagy
+#+language: en
+
+#+html: <a href="https://melpa.org/#/tokei"><img alt="MELPA" src="https://melpa.org/packages/tokei-badge.svg"/></a>
+#+html: <a href="https://stable.melpa.org/#/tokei"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/tokei-badge.svg"/></a>
 
 Tokei.el is a major-mode for Emacs, that displays codebase statistics with the help of [[https://github.com/XAMPPRocky/tokei][Tokei]].
 
