@@ -134,6 +134,7 @@ Data is provided via the JSON argument."
 
 (define-derived-mode tokei-mode magit-section-mode "Tokei"
   "Tokei mode."
+  :interactive nil
   :group 'tokei
   (setq tokei-data (tokei--data))
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
