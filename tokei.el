@@ -130,6 +130,23 @@ Data is provided via the JSON argument."
         :comments .stats.comments
         :blanks .stats.blanks))))
 
+(defun tokei--imenu-create-index-function ()
+  "Create an imenu index for tokei-mode buffers."
+  `(("Languages"
+      ,@(cl-loop for lang in (oref magit-root-section children)
+          collect
+          (cons (oref lang value) (oref lang start))))
+     ("Files"
+       ,@(mapcar
+           (lambda (file)
+             (cons
+               (string-remove-prefix "./" (oref file value))
+               (oref file start)))
+           (flatten-tree
+             (cl-loop for lang in (oref magit-root-section children)
+               collect
+               (oref lang children)))))))
+
 (define-derived-mode tokei-mode magit-section-mode "Tokei"
   "Tokei mode."
   :interactive nil
@@ -143,6 +160,7 @@ Data is provided via the JSON argument."
                             "Code"
                             tokei-separator
                             "Comments")))
+  (setq-local imenu-create-index-function #'tokei--imenu-create-index-function)
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
