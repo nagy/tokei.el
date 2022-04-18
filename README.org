@@ -9,6 +9,12 @@ Tokei.el is a major-mode for Emacs, that displays codebase statistics with the h
 
 [[https://github.com/nagy/tokei.el/raw/screenshot/emacs-screenshot.svg]]
 
+* Features
+
+ * Collapsible sections with the help of [[https://magit.vc/manual/magit-section/][magit-section]]
+ * Imenu support
+ * Customizable faces
+
 * Usage
 
 After installing, you can use it with =M-x tokei= in any folder, which you want to scan.
