@@ -75,14 +75,16 @@
 (defvar-local tokei-data nil "Tokei buffer local data.")
 
 (defun tokei--data ()
-  "Return newly created tokei data for this directory."
-  (json-parse-string
-    (with-temp-buffer
-      (if (zerop (call-process tokei-program nil t nil "--output=json" ))
-        (buffer-string)
-        ""))
-    :object-type 'alist
-    :array-type 'list))
+  "Return newly created, pre-sorted tokei data for this directory."
+  (sort
+    (json-parse-string
+      (with-temp-buffer
+        (if (zerop (call-process tokei-program nil t nil "--output=json" ))
+          (buffer-string)
+          ""))
+      :object-type 'alist
+      :array-type 'list)
+    #'tokei--sort-predicate))
 
 (defun tokei--sort-predicate (elem1 elem2)
   "A predicate to compare ELEM1 and ELEM2 by num of code and then name."
@@ -93,10 +95,6 @@
     (if (= numcode1 numcode2)
       (string-lessp name1 name2)
       (> numcode1 numcode2))))
-
-(cl-defun tokei--get-sorted (&optional (data tokei-data))
-  "Sort the provided tokei DATA."
-  (sort (copy-sequence data) #'tokei--sort-predicate))
 
 (defun tokei--formatted-stats (code comments)
   "Format one entry.
@@ -148,7 +146,7 @@ Data is provided via the JSON argument."
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
-      (cl-loop for lang in (tokei--get-sorted)
+      (cl-loop for lang in tokei-data
         for langname = (format "%s" (car lang))
         unless (string= langname "Total")
         do
