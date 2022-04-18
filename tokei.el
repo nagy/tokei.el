@@ -74,7 +74,7 @@
 
 (defvar-local tokei-data nil "Tokei buffer local data.")
 
-(defun tokei--data ()
+(defun tokei--make-data ()
   "Return newly created, pre-sorted tokei data for this directory."
   (sort
     (json-parse-string
@@ -151,7 +151,7 @@ Data is provided via the JSON argument."
   "Tokei mode."
   :interactive nil
   :group 'tokei
-  (setq tokei-data (tokei--data))
+  (setq tokei-data (tokei--make-data))
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
   (when tokei-use-header-line
     (setq-local header-line-format (concat
