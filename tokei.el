@@ -89,9 +89,9 @@
 (defun tokei--sort-predicate (elem1 elem2)
   "A predicate to compare ELEM1 and ELEM2 by num of code and then name."
   (let ((numcode1 (or (alist-get 'code elem1) (alist-get 'code (alist-get 'stats elem1))))
-       (numcode2 (or (alist-get 'code elem2) (alist-get 'code (alist-get 'stats elem2))))
-       (name1 (or (alist-get 'name elem1) (car  elem1)))
-       (name2 (or (alist-get 'name elem2) (car  elem2))))
+         (numcode2 (or (alist-get 'code elem2) (alist-get 'code (alist-get 'stats elem2))))
+         (name1 (or (alist-get 'name elem1) (car  elem1)))
+         (name2 (or (alist-get 'name elem2) (car  elem2))))
     (if (= numcode1 numcode2)
       (string-lessp name1 name2)
       (> numcode1 numcode2))))
@@ -120,8 +120,8 @@ Takes CODE and COMMENTS entries."
 
 Data is provided via the JSON argument."
   (cl-loop for s in (sort
-                (copy-sequence (alist-get 'reports json))
-                #'tokei--sort-predicate)
+                      (copy-sequence (alist-get 'reports json))
+                      #'tokei--sort-predicate)
     collect
     (let-alist s
       (list
@@ -155,11 +155,11 @@ Data is provided via the JSON argument."
   (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
   (when tokei-use-header-line
     (setq-local header-line-format (concat
-                            "File"
-                            (propertize " " 'display '(space :align-to center))
-                            "Code"
-                            tokei-separator
-                            "Comments")))
+                                     "File"
+                                     (propertize " " 'display '(space :align-to center))
+                                     "Code"
+                                     tokei-separator
+                                     "Comments")))
   (setq-local imenu-create-index-function #'tokei--imenu-create-index-function)
   (let ((inhibit-read-only t))
     (erase-buffer)
