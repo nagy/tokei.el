@@ -116,20 +116,13 @@ Takes CODE and COMMENTS entries."
       ((>= 9999 comments) " "))
     (propertize (number-to-string comments) 'face 'tokei-num-comments-face)))
 
-(defun tokei--get-formatted-files (json)
-  "Retrieve multiple formatted entries.
+(defun tokei--get-sorted-files (json)
+  "Retrieve multiple sorted entries.
 
 Data is provided via the JSON argument."
-  (cl-loop for s in (sort
-                      (copy-sequence (alist-get 'reports json))
-                      #'tokei--sort-predicate)
-    collect
-    (let-alist s
-      (list
-        :name .name
-        :code .stats.code
-        :comments .stats.comments
-        :blanks .stats.blanks))))
+  (sort
+    (copy-sequence (alist-get 'reports json))
+    #'tokei--sort-predicate))
 
 (defun tokei--imenu-create-index-function ()
   "Create an imenu index for tokei-mode buffers."
@@ -152,18 +145,14 @@ Data is provided via the JSON argument."
   "Tokei mode."
   :interactive nil
   :group 'tokei
-  (when tokei-use-header-line
-    (setq-local header-line-format (concat
-                                     "File"
-                                     (propertize " " 'display '(space :align-to center))
-                                     "Code"
-                                     tokei-separator
-                                     "Comments")))
   (setq-local
     tokei-data (tokei--make-data)
     revert-buffer-function (lambda (&rest _) (tokei-mode))
     bookmark-make-record-function #'tokei--bookmark-make-record-function
-    imenu-create-index-function #'tokei--imenu-create-index-function)
+    imenu-create-index-function #'tokei--imenu-create-index-function
+    header-line-format (when tokei-use-header-line
+                         (concat "File" (propertize " " 'display '(space :align-to center))
+                           "Code" tokei-separator "Comments")))
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
@@ -177,19 +166,17 @@ Data is provided via the JSON argument."
                                   (propertize " " 'display '(space :align-to center))
                                   (tokei--formatted-stats (alist-get 'code lang) (alist-get 'comments lang))
                                   "\n"))
-          (cl-loop for file in (tokei--get-formatted-files lang)
-            for filename = (plist-get file :name)
-            for numcode = (plist-get file :code)
-            for numcomments = (plist-get file :comments)
+          (cl-loop for file in (tokei--get-sorted-files lang)
             do
-            (magit-insert-section (tokei-file filename)
-              (insert
-                (string-remove-prefix "./" filename)
-                (propertize " " 'display '(space :align-to center))
-                (tokei--formatted-stats numcode numcomments)
-                "\n")))
+            (let-alist file
+              (magit-insert-section (tokei-file .name)
+                (insert
+                  (string-remove-prefix "./" .name)
+                  (propertize " " 'display '(space :align-to center))
+                  (tokei--formatted-stats .stats.code .stats.comments)
+                  "\n"))))
           (insert "\n"))))
-    (setf (point) (point-min))))
+    (goto-char (point-min))))
 
 (defun tokei--bookmark-make-record-function ()
   "A function to be used as `bookmark-make-record-function'."
