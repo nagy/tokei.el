@@ -5,7 +5,7 @@
 ;; Author: Daniel Nagy <https://github.com/nagy>
 ;; Maintainer: Daniel Nagy <danielnagy@posteo.de>
 ;; Created: April 1, 2022
-;; Version: 0.1
+;; Version: 0.2
 ;; Homepage: https://github.com/nagy/tokei.el
 ;; Package-Requires: ((emacs "27.1") (magit-section "3.3.0"))
 ;;
@@ -89,13 +89,14 @@
 
 (defun tokei--sort-predicate (elem1 elem2)
   "A predicate to compare ELEM1 and ELEM2 by num of code and then name."
-  (let ((numcode1 (or (alist-get 'code elem1) (alist-get 'code (alist-get 'stats elem1))))
-         (numcode2 (or (alist-get 'code elem2) (alist-get 'code (alist-get 'stats elem2))))
-         (name1 (or (alist-get 'name elem1) (car  elem1)))
-         (name2 (or (alist-get 'name elem2) (car  elem2))))
-    (if (= numcode1 numcode2)
-      (string-lessp name1 name2)
-      (> numcode1 numcode2))))
+  (let-alist `((el1 . ,elem1) (el2 . ,elem2))
+    (let ((numcode1 (or .el1.code .el1.stats.code))
+         (numcode2 (or .el2.code .el2.stats.code))
+         (name1 (or .el1.name (car  elem1)))
+         (name2 (or .el2.name (car  elem2))))
+      (if (= numcode1 numcode2)
+        (string-lessp name1 name2)
+        (> numcode1 numcode2)))))
 
 (defun tokei--formatted-stats (code comments)
   "Format one entry.
