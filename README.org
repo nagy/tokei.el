@@ -13,6 +13,7 @@ Tokei.el is a major-mode for Emacs, that displays codebase statistics with the h
 
  * Collapsible sections with the help of [[https://magit.vc/manual/magit-section/][magit-section]]
  * Imenu support
+ * Bookmark support
  * Customizable faces
 
 * Usage

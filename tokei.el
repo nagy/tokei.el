@@ -30,6 +30,7 @@
 ;;
 ;;; Code:
 
+(require 'bookmark)
 (require 'magit-section)
 (require 'json)
 (eval-when-compile
@@ -151,8 +152,6 @@ Data is provided via the JSON argument."
   "Tokei mode."
   :interactive nil
   :group 'tokei
-  (setq tokei-data (tokei--make-data))
-  (setq-local revert-buffer-function (lambda (&rest _) (tokei-mode)))
   (when tokei-use-header-line
     (setq-local header-line-format (concat
                                      "File"
@@ -160,7 +159,11 @@ Data is provided via the JSON argument."
                                      "Code"
                                      tokei-separator
                                      "Comments")))
-  (setq-local imenu-create-index-function #'tokei--imenu-create-index-function)
+  (setq-local
+    tokei-data (tokei--make-data)
+    revert-buffer-function (lambda (&rest _) (tokei-mode))
+    bookmark-make-record-function #'tokei--bookmark-make-record-function
+    imenu-create-index-function #'tokei--imenu-create-index-function)
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
@@ -187,6 +190,19 @@ Data is provided via the JSON argument."
                 "\n")))
           (insert "\n"))))
     (setf (point) (point-min))))
+
+(defun tokei--bookmark-make-record-function ()
+  "A function to be used as `bookmark-make-record-function'."
+  `(,(concat "tokei: " (abbreviate-file-name default-directory))
+     (handler . tokei-bookmark-jump )
+     (filename . ,(abbreviate-file-name default-directory))))
+
+;;;###autoload
+(defun tokei-bookmark-jump (bm)
+  "Jump to the tokei bookmark BM."
+  (interactive (list (read-from-minibuffer "Bookmark: ")))
+  (let ((default-directory (bookmark-prop-get bm 'filename)))
+    (tokei)))
 
 ;;;###autoload
 (defun tokei ()
