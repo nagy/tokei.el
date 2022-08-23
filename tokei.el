@@ -80,7 +80,7 @@
   (sort
     (json-parse-string
       (with-temp-buffer
-        (if (zerop (call-process tokei-program nil t nil "--output=json" ))
+        (if (zerop (call-process tokei-program nil '(t nil) nil "--output=json" ))
           (buffer-string)
           ""))
       :object-type 'alist
