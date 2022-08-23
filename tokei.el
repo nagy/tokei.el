@@ -182,7 +182,7 @@ Data is provided via the JSON argument."
 (defun tokei--bookmark-make-record-function ()
   "A function to be used as `bookmark-make-record-function'."
   `(,(concat "tokei: " (abbreviate-file-name default-directory))
-     (handler . tokei-bookmark-jump )
+     (handler . tokei-bookmark-jump)
      (filename . ,(abbreviate-file-name default-directory))))
 
 ;;;###autoload
@@ -191,6 +191,7 @@ Data is provided via the JSON argument."
   (interactive (list (read-from-minibuffer "Bookmark: ")))
   (let ((default-directory (bookmark-prop-get bm 'filename)))
     (tokei)))
+(put 'tokei-bookmark-jump 'bookmark-handler-type "Tokei")
 
 ;;;###autoload
 (defun tokei ()
