@@ -205,7 +205,6 @@ Data is provided via the JSON argument."
 ;; TODO dired tokei only marked entries to filter out
 ;; TODO count all marked lines ( region )
 ;; TODO show only minimum amount of code/comment lines. take prefix argument
-;; TODO segment definition for telephone line
 ;; TODO project.el mode new in emacs
 
 (provide 'tokei)
