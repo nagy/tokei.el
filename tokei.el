@@ -38,11 +38,13 @@
 (defgroup tokei nil
   "Display codebase statistics."
   :group 'extensions
+  :link '(url-link :tag "Repository" "https://github.com/nagy/tokei.el")
   :prefix "tokei-")
 
 (defcustom tokei-program "tokei"
   "Path to the `tokei' program."
-  :type 'string)
+  :type 'string
+  :risky t)
 
 (defcustom tokei-use-header-line t
   "If non-nil, display a header line."
@@ -122,7 +124,7 @@ Data is provided via the JSON argument."
    #'tokei--sort-predicate))
 
 (defun tokei--imenu-create-index-function ()
-  "Create an imenu index for tokei-mode buffers."
+  "Create an imenu index for `tokei-mode' buffers."
   `(("Languages"
      ,@(cl-loop for lang in (oref magit-root-section children)
                 collect
