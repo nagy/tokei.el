@@ -1,6 +1,6 @@
 ;;; tokei.el --- Display codebase statistics -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2022 Daniel Nagy
+;; Copyright (C) 2025 Daniel Nagy
 ;;
 ;; Author: Daniel Nagy <https://github.com/nagy>
 ;; Maintainer: Daniel Nagy <danielnagy@posteo.de>
@@ -45,7 +45,7 @@
   :prefix "tokei-")
 
 (defcustom tokei-program "tokei"
-  "Path to the 'tokei' program."
+  "Path to the `tokei' program."
   :type 'string)
 
 (defcustom tokei-use-header-line t
