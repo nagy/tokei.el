@@ -32,10 +32,6 @@
 
 (require 'bookmark)
 (require 'magit-section)
-(require 'json)
-(eval-when-compile
-  (require 'cl-lib)
-  (require 'let-alist))
 
 ;;; Options
 
