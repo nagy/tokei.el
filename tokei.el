@@ -161,7 +161,8 @@ Data is provided via the JSON argument."
                do
                (magit-insert-section (tokei-language langname)
                  (magit-insert-heading (concat
-                                        (propertize langname 'face 'magit-section-heading)
+                                        (propertize langname 'font-lock-face 'magit-section-heading)
+                                        (tokei--child-count lang)
                                         (propertize " " 'display '(space :align-to center))
                                         (tokei--formatted-stats (alist-get 'code lang) (alist-get 'comments lang))
                                         "\n"))
@@ -199,6 +200,13 @@ Data is provided via the JSON argument."
     (user-error "Command not found: %s" tokei-program))
   (switch-to-buffer (generate-new-buffer "*tokei*"))
   (tokei-mode))
+
+(defun tokei--child-count (language)
+  "Reimplementation of `magit-insert-child-count' for LANGUAGE."
+  (when magit-section-show-child-count
+    (concat " "
+            (propertize (format "(%d)" (length (alist-get 'reports language)))
+                        'font-lock-face 'magit-section-child-count))))
 
 ;; TODO virtual dired from one language files
 ;; TODO context-menu
