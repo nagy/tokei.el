@@ -5,7 +5,7 @@
 ;; Author: Daniel Nagy <https://github.com/nagy>
 ;; Maintainer: Daniel Nagy <danielnagy@posteo.de>
 ;; Created: April 1, 2022
-;; Version: 0.2
+;; Version: 0.2.1
 ;; Homepage: https://github.com/nagy/tokei.el
 ;; Package-Requires: ((emacs "27.1") (magit-section "3.3.0"))
 ;;
