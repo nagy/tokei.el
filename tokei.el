@@ -148,10 +148,11 @@ Data is provided via the JSON argument."
    tokei-data (tokei--make-data)
    revert-buffer-function (lambda (&rest _) (tokei-mode))
    bookmark-make-record-function #'tokei--bookmark-make-record-function
-   imenu-create-index-function #'tokei--imenu-create-index-function
-   header-line-format (when tokei-use-header-line
-                        (concat "File" (propertize " " 'display '(space :align-to center))
-                                "Code" tokei-separator "Comments")))
+   imenu-create-index-function #'tokei--imenu-create-index-function)
+  (when tokei-use-header-line
+    (setq header-line-format
+          (concat "File" (propertize " " 'display '(space :align-to center))
+                  "Code" tokei-separator "Comments")))
   (let ((inhibit-read-only t))
     (erase-buffer)
     (magit-insert-section (tokei-root)
